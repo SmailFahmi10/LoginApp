@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Global styles - Econocom Auth App
+   Imports del sistema de diseño (ITCSS + Atomic Design)
+   ========================================================================== */
+
+// 1. Material Theme (debe ir primero)
+@import "custom-material-theme";
+
+// 2. Normalize & Reset
+@import "4-generic/normalize";
+@import "4-generic/reset";
+
+// 3. Settings (variables)
+@import "1-settings/variables";
+
+// 4. Tools (mixins y funciones)
+@import "3-tools/font-face";
+@import "3-tools/breakpoints";
+@import "3-tools/notouch-hover";
+@import "3-tools/fluid-type";
+@import "3-tools/nth-child";
+@import "3-tools/flexbox";
+@import "3-tools/transition";
+@import "3-tools/ellipsis";
+
+// 5. Tipografía y fuentes
+@import "2-design-tokens/typography";
+
+// 6. Elementos base
+@import "5-elements/buttons";
+
+// 7. Material overrides
+@import "material-overrides";
+
+// 8. Utilidades
+@import "8-utilities/modifiers";
+@import "8-utilities/states";
+
+// Global layout
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background-color: $neutral-95;
+}

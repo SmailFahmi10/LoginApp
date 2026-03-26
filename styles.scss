@@ -1,0 +1,14 @@
+/* You can add global styles to this file, and also import other style files */
+// Plus imports for other components in your app.
+/*********************************************/
+@import "assets/scss/4-generic/_normalize";
+@import "assets/scss/4-generic/_reset";
+/*********************************************/
+
+//Add anything you need to use globally here
+//example: @import "assets/scss/4-generic/_typography";
+@import "assets/scss/1-settings/_variables";
+@import "assets/scss/3-tools/breakpoints";
+@import "assets/scss/3-tools/notouch-hover";
+@import "assets/scss/3-tools/fluid-type";
+@import "assets/scss/3-tools/nth-child";

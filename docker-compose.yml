@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  # ── Backend Spring Boot ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: econocom-backend
+    ports:
+      - "8080:8080"
+    # El backend es stateless (JWT), no necesita volúmenes ni base de datos
+    restart: unless-stopped
+
+  # ── Frontend Angular (servido por nginx) ─────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: econocom-frontend
+    ports:
+      - "4200:80"      # nginx escucha en 80 dentro del contenedor → host:4200
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+# Las llamadas HTTP del frontend van a http://localhost:8080 desde el navegador
+# del usuario (no desde el contenedor), por lo que CORS sigue funcionando igual
+# que en desarrollo tradicional.

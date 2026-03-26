@@ -1,0 +1,48 @@
+<!-- ============================================================
+     SSO Callback - Econocom
+     Muestra el resultado del proceso de autenticación SSO
+     ============================================================ -->
+
+<div class="sso-callback">
+
+  <div class="sso-callback__card">
+
+    <!-- Logo -->
+    <img
+      class="sso-callback__logo"
+      src="assets/images/logos/Econocom.svg"
+      alt="Econocom"
+    />
+
+    <!-- Estado: cargando -->
+    <ng-container *ngIf="state === 'loading'">
+      <mat-spinner class="sso-callback__spinner" diameter="48"></mat-spinner>
+      <p class="sso-callback__text">Procesando autenticación SSO...</p>
+    </ng-container>
+
+    <!-- Estado: éxito -->
+    <ng-container *ngIf="state === 'success'">
+      <mat-icon class="sso-callback__icon sso-callback__icon--success">check_circle</mat-icon>
+      <h2 class="sso-callback__title heading--3">Autenticación completada</h2>
+      <p class="sso-callback__text">{{ message }}</p>
+      <p class="sso-callback__text sso-callback__text--hint">Redirigiendo al panel...</p>
+    </ng-container>
+
+    <!-- Estado: error -->
+    <ng-container *ngIf="state === 'error'">
+      <mat-icon class="sso-callback__icon sso-callback__icon--error">error_outline</mat-icon>
+      <h2 class="sso-callback__title heading--3">Error de autenticación SSO</h2>
+      <p class="sso-callback__text">{{ message }}</p>
+      <button
+        mat-flat-button
+        color="primary"
+        class="sso-callback__btn"
+        (click)="goToLogin()"
+      >
+        Volver al login
+      </button>
+    </ng-container>
+
+  </div>
+
+</div>

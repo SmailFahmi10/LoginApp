@@ -1,0 +1,10 @@
+# Normalizar saltos de línea a LF en el repositorio (evita warnings en Windows)
+* text=auto eol=lf
+
+# Binarios — no tocar los saltos de línea
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.png   binary
+*.jpg   binary
+*.ico   binary

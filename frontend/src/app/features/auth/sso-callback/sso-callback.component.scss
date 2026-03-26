@@ -1,0 +1,77 @@
+// ============================================================
+// sso-callback.component.scss
+// BEM: .sso-callback
+// ============================================================
+
+// Importar settings y tools del sistema de diseño
+@import "1-settings/variables";
+@import "3-tools/flexbox";
+
+.sso-callback {
+  @include flexbox(column, nowrap) {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: $neutral-95;
+    padding: $spacing-l;
+  }
+
+  &__card {
+    @include flexbox(column, nowrap) {
+      align-items: center;
+      gap: $spacing-m;
+    }
+
+    width: 100%;
+    max-width: 400px;
+    padding: $spacing-xl;
+    background-color: $white;
+    border-radius: $border-radius-m;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  &__logo {
+    height: 32px;
+    margin-bottom: $spacing-m;
+  }
+
+  &__spinner {
+    margin: $spacing-m 0;
+  }
+
+  &__icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+
+    &--success {
+      color: $success;
+    }
+
+    &--error {
+      color: $error;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    color: $neutral-10;
+  }
+
+  &__text {
+    margin: 0;
+    color: $neutral-40;
+    font-size: $font-s;
+
+    &--hint {
+      color: $neutral-60;
+      font-size: $font-xs;
+    }
+  }
+
+  &__btn {
+    margin-top: $spacing-s;
+    width: 100%;
+  }
+}

@@ -1,0 +1,65 @@
+// ============================================================
+// dashboard.component.scss
+// BEM: .dashboard
+// ============================================================
+
+// Importar settings y tools del sistema de diseño
+@import "1-settings/variables";
+@import "3-tools/flexbox";
+
+.dashboard {
+  @include flexbox(column, nowrap) {
+    min-height: 100vh;
+    background-color: $neutral-95;
+  }
+
+  &__header {
+    @include flexbox(row, nowrap) {
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    padding: $spacing-m $spacing-xl;
+    background-color: $white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  &__logo {
+    height: 32px;
+  }
+
+  &__logout-btn {
+    @include flexbox(row, nowrap) {
+      align-items: center;
+      gap: $spacing-xs;
+    }
+  }
+
+  &__main {
+    @include flexbox(column, nowrap) {
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: $spacing-m;
+      text-align: center;
+      padding: $spacing-xxl $spacing-l;
+    }
+  }
+
+  &__icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: $success;
+  }
+
+  &__title {
+    margin: 0;
+    color: $neutral-10;
+  }
+
+  &__text {
+    color: $neutral-40;
+    max-width: 480px;
+  }
+}

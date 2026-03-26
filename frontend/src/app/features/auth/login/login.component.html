@@ -1,0 +1,133 @@
+<!-- ============================================================
+     Página de Login - Econocom
+     Estructura: layout de dos columnas (imagen | formulario)
+     BEM: .login-page, .login-form
+     Atomic Design: Átomos (input, button) → Moléculas (form-field) → Organismo (login-form)
+     ============================================================ -->
+
+<div class="login-page">
+
+  <!-- Columna izquierda: imagen decorativa -->
+  <aside class="login-page__aside" aria-hidden="true">
+    <img
+      class="login-page__aside-image"
+      src="assets/images/login.svg"
+      alt=""
+      role="presentation"
+    />
+  </aside>
+
+  <!-- Columna derecha: formulario -->
+  <main class="login-page__main">
+
+    <!-- Organismo: login-form -->
+    <section class="login-form">
+
+      <!-- Cabecera con logo -->
+      <header class="login-form__header">
+        <img
+          class="login-form__logo"
+          src="assets/images/logos/Econocom.svg"
+          alt="Econocom"
+        />
+        <h1 class="login-form__title heading--2">Accede a tu cuenta</h1>
+      </header>
+
+      <!-- Formulario reactivo -->
+      <form
+        class="login-form__body"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        novalidate
+      >
+
+        <!-- Molécula: campo email -->
+        <div class="login-form__field" [class.login-form__field--error]="!!emailError">
+          <mat-form-field appearance="outline" class="login-form__field__input">
+            <mat-label>Email</mat-label>
+            <!-- Átomo: input email -->
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="usuario@empresa.com"
+              autocomplete="email"
+            />
+            <mat-icon matSuffix>email</mat-icon>
+            <!-- Mensaje de error en la interfaz (no alert ni console.log) -->
+            <mat-error *ngIf="emailError">{{ emailError }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Molécula: campo password -->
+        <div class="login-form__field" [class.login-form__field--error]="!!passwordError">
+          <mat-form-field appearance="outline" class="login-form__field__input">
+            <mat-label>Contraseña</mat-label>
+            <!-- Átomo: input password -->
+            <input
+              matInput
+              type="password"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <mat-icon matSuffix>lock</mat-icon>
+            <mat-error *ngIf="passwordError">{{ passwordError }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Error global del backend (credenciales inválidas, etc.) -->
+        <div class="login-form__error" *ngIf="errorMessage" role="alert">
+          <mat-icon class="login-form__error-icon">error_outline</mat-icon>
+          <span class="login-form__error-text">{{ errorMessage }}</span>
+        </div>
+
+        <!-- Acciones del formulario -->
+        <div class="login-form__actions">
+
+          <!-- Átomo: botón principal "ENTRAR" -->
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="login-form__btn login-form__btn--primary"
+            [disabled]="loginForm.invalid || isLoading"
+          >
+            <mat-spinner
+              *ngIf="isLoading"
+              diameter="20"
+              class="login-form__spinner"
+            ></mat-spinner>
+            <span *ngIf="!isLoading">ENTRAR</span>
+          </button>
+
+          <!-- Separador -->
+          <div class="login-form__divider">
+            <span class="login-form__divider-text">o</span>
+          </div>
+
+          <!-- Átomo: botón SSO (ampliación) -->
+          <button
+            mat-stroked-button
+            type="button"
+            class="login-form__btn login-form__btn--sso"
+            (click)="onSsoLogin()"
+          >
+            <img
+              class="login-form__sso-icon"
+              src="assets/images/logos/Logo-RD.svg"
+              alt=""
+              aria-hidden="true"
+            />
+            Iniciar sesión con SSO
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+</div>
