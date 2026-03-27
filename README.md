@@ -162,6 +162,70 @@ docker compose up --build -d
 docker compose down --rmi all
 ```
 
+---
+
+## Despliegue en producción con Traefik + Cloudflare
+
+Arquitectura de red (igual que el resto de apps del servidor):
+```
+Internet → Cloudflare (DNS + SSL) → Servidor Linux → Traefik → econocom-frontend:80
+                                                                      ├── /        → Angular SPA
+                                                                      └── /api/*   → econocom-backend:8080
+```
+
+El backend **nunca está expuesto** al exterior. Traefik solo ve el frontend (Nginx),
+que a su vez proxea las llamadas a la API al backend por la red interna Docker.
+
+### 1. Prerrequisito: red `traefik-public` en el servidor
+
+Si Traefik ya está corriendo para otras apps (como `shop.smailfahmi.com`),
+la red ya existe. Verificar:
+
+```bash
+docker network ls | grep traefik-public
+```
+
+Si no existe, crearla:
+
+```bash
+docker network create traefik-public
+```
+
+### 2. Preparar el .env en el servidor
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Contenido del `.env`:
+
+```env
+MY_DOMAIN=login.smailfahmi.com
+
+JWT_SECRET=<resultado de: openssl rand -base64 32>
+JWT_EXPIRATION=3600000
+
+CORS_ALLOWED_ORIGINS=https://login.smailfahmi.com
+SSO_REDIRECT_URI=https://login.smailfahmi.com/sso/callback
+SSO_PROVIDER_URL=https://login.smailfahmi.com/api/auth/sso/provider
+```
+
+### 3. Arrancar
+
+```bash
+docker compose up --build -d
+```
+
+Traefik detecta automáticamente los labels del contenedor `econocom-frontend`
+y empieza a enrutar `login.smailfahmi.com` hacia él.
+
+Verificar:
+```bash
+docker compose ps
+docker compose logs -f
+```
+
 ### Solución de problemas
 
 **El puerto 8080 o 4200 ya está en uso**
@@ -176,12 +240,12 @@ Detén el proceso o cambia el puerto en `docker-compose.yml`.
 
 **El frontend no conecta con el backend**
 
-Las llamadas HTTP las hace el navegador del usuario, no el contenedor nginx.
-`localhost:8080` en el navegador apunta al puerto del host donde corre Docker,
-que está mapeado al contenedor del backend. Verifica que el backend esté activo:
+En producción Nginx hace de proxy: `/api/*` → `backend:8080`. Verificar:
 
 ```bash
-docker compose ps
+# ¿El backend está sano?
+docker compose --profile prod exec frontend curl -s http://backend:8080/api/auth/login
+# En dev:
 curl http://localhost:8080/api/auth/login
 ```
 

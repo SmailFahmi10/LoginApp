@@ -1,5 +1,6 @@
 package com.econocom.authapi.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,13 +13,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 /**
  * Configuración de seguridad de la aplicación.
  *
  * Define:
- * 1. Política CORS: permite peticiones desde http://localhost:4200 (frontend Angular)
+ * 1. Política CORS: orígenes permitidos inyectados desde application.properties
+ *    (variable de entorno CORS_ALLOWED_ORIGINS en producción)
  * 2. Rutas públicas: todos los endpoints bajo /api/auth/** son accesibles sin autenticación
  * 3. Sesiones: se deshabilita la gestión de sesiones (API stateless con JWT)
  * 4. CSRF: se deshabilita ya que usamos tokens JWT (no cookies de sesión)
@@ -28,10 +30,19 @@ import java.util.Collections;
 public class WebSecurityConfig {
 
     /**
-     * Configura la cadena de filtros de seguridad HTTP.
+     * Orígenes CORS permitidos, separados por coma.
+     * Valor por defecto para desarrollo: http://localhost:4200
+     * En producción se sobreescribe via variable de entorno CORS_ALLOWED_ORIGINS.
      *
-     * @param http configurador de seguridad HTTP
-     * @return SecurityFilterChain configurado
+     * En producción el frontend se sirve desde el mismo dominio que el backend
+     * (Nginx hace de reverse proxy: /api/* → backend), por lo que el navegador
+     * nunca realiza peticiones cross-origin. Este valor es una salvaguarda extra.
+     */
+    @Value("${cors.allowed-origins:http://localhost:4200}")
+    private String allowedOriginsRaw;
+
+    /**
+     * Configura la cadena de filtros de seguridad HTTP.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,8 +65,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
             .and()
 
-            // Configurar gestión de sesiones como STATELESS
-            // No se crean ni se usan sesiones HTTP (cada petición se autentica con JWT)
+            // API stateless: no se crean ni se usan sesiones HTTP
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -65,43 +75,33 @@ public class WebSecurityConfig {
     /**
      * Configuración CORS (Cross-Origin Resource Sharing).
      *
-     * Permite que el frontend Angular (http://localhost:4200) realice
-     * peticiones al backend (http://localhost:8080).
-     *
-     * Sin esta configuración, el navegador bloquearía las peticiones
-     * cross-origin por política de seguridad del navegador.
-     *
-     * @return CorsConfigurationSource con las reglas CORS definidas
+     * Los orígenes se leen de la propiedad cors.allowed-origins para que sean
+     * configurables por entorno sin recompilar. En producción el tráfico llega
+     * a través del mismo dominio (Nginx reverse proxy), por lo que en la práctica
+     * no habrá peticiones cross-origin desde el navegador.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Orígenes permitidos: solo el frontend Angular en desarrollo
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        // Parsear la lista de orígenes separada por comas
+        List<String> origins = Arrays.asList(allowedOriginsRaw.split(","));
+        configuration.setAllowedOrigins(origins);
 
-        // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Headers permitidos en las peticiones
         configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",  // Para enviar el token JWT
-                "Content-Type",   // Para peticiones JSON
-                "Accept",         // Header estándar
-                "Origin",         // Header CORS
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
                 "X-Requested-With"
         ));
 
-        // Headers expuestos en las respuestas (accesibles desde JavaScript)
-        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-        // Permitir envío de credenciales (cookies, auth headers)
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
-
-        // Tiempo en segundos que el navegador cachea la respuesta preflight
         configuration.setMaxAge(3600L);
 
-        // Aplicar configuración CORS a todas las rutas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

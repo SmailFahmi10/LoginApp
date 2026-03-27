@@ -1,30 +1,62 @@
 version: '3.8'
 
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — Producción con Traefik
+#
+# Traefik (ya corriendo en el servidor) enruta login.smailfahmi.com → frontend:80
+# El frontend (Nginx) proxea /api/* al backend internamente.
+# El backend NO está expuesto a Traefik ni al exterior.
+#
+# Arrancar:
+#   docker compose up --build -d
+# ─────────────────────────────────────────────────────────────────────────────
+
 services:
 
-  # ── Backend Spring Boot ──────────────────────────────────────────────────────
+  # ── Backend Spring Boot ─────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: econocom-backend
-    ports:
-      - "8080:8080"
-    # El backend es stateless (JWT), no necesita volúmenes ni base de datos
-    restart: unless-stopped
+    restart: always
+    env_file: .env
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      SSO_REDIRECT_URI: ${SSO_REDIRECT_URI}
+      SSO_PROVIDER_URL: ${SSO_PROVIDER_URL}
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --max-time 5 http://localhost:8080/api/auth/login -o /dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - traefik-public
 
-  # ── Frontend Angular (servido por nginx) ─────────────────────────────────────
+  # ── Frontend Angular (servido por Nginx) ─────────────────────────────────────
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
     container_name: econocom-frontend
-    ports:
-      - "4200:80"      # nginx escucha en 80 dentro del contenedor → host:4200
+    restart: always
     depends_on:
-      - backend
-    restart: unless-stopped
+      backend:
+        condition: service_healthy
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.econocom.rule=Host(`${MY_DOMAIN}`)"
+      - "traefik.http.routers.econocom.entrypoints=web"
+      #- "traefik.http.routers.econocom.tls=true"
+      - "traefik.http.services.econocom.loadbalancer.server.port=80"
 
-# Las llamadas HTTP del frontend van a http://localhost:8080 desde el navegador
-# del usuario (no desde el contenedor), por lo que CORS sigue funcionando igual
-# que en desarrollo tradicional.
+networks:
+  traefik-public:
+    external: true

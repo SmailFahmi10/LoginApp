@@ -19,6 +19,10 @@ FROM eclipse-temurin:8-jre
 
 WORKDIR /app
 
+# curl necesario para el healthcheck de Docker Compose
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copiamos únicamente el JAR generado en la etapa anterior
 COPY --from=build /app/target/*.jar app.jar
 

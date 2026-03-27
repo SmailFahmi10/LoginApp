@@ -17,8 +17,13 @@ import { LoginRequest, LoginResponse, SsoCallbackResponse } from '../models/auth
 })
 export class AuthService {
 
-  /** URL base del backend */
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  /**
+   * URL base del backend.
+   * En producción Nginx actúa de reverse proxy: /api/* → backend:8080
+   * En desarrollo el proxy de Angular CLI hace lo mismo (proxy.conf.json).
+   * Usar URL relativa evita hardcodear el host y elimina problemas CORS.
+   */
+  private readonly apiUrl = '/api/auth';
 
   /** Clave bajo la que se guarda el JWT en localStorage */
   private readonly tokenKey = 'econocom_token';
@@ -121,7 +126,7 @@ export class AuthService {
       message = error.error.message;
     } else if (error.status === 0) {
       // Error de red: el backend no está disponible
-      message = 'No se puede conectar con el servidor. Verifique que el backend esté activo en el puerto 8080.';
+      message = 'No se puede conectar con el servidor. Verifique que el backend esté activo.';
     } else if (error.status === 401) {
       message = 'Credenciales inválidas. Verifique su email y contraseña.';
     }
