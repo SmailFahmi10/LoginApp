@@ -85,8 +85,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Parsear la lista de orígenes separada por comas
-        List<String> origins = Arrays.asList(allowedOriginsRaw.split(","));
-        configuration.setAllowedOrigins(origins);
+        configuration.setAllowedOrigins(Arrays.asList(allowedOriginsRaw.split(",")));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
