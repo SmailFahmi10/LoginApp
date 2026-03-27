@@ -6,13 +6,15 @@ Implementación full-stack de un sistema de autenticación con Spring Boot (back
 
 ## Requisitos previos
 
-| Herramienta | Versión mínima |
-|-------------|----------------|
-| Java JDK    | 1.8            |
-| Maven       | 3.6+           |
-| Node.js     | 16+            |
-| npm         | 8+             |
-| Angular CLI | 16.2.16        |
+| Herramienta | Versión mínima | Notas |
+|-------------|----------------|-------|
+| Java JDK    | 1.8            | |
+| Maven       | 3.6+           | |
+| Node.js     | 16+            | |
+| npm         | 8+             | |
+| Angular CLI | 16.2.16        | Opcional — `npm start` usa el CLI incluido en `node_modules` |
+
+> No se requiere ninguna configuración adicional. El proyecto funciona directamente tras clonar.
 
 ---
 
