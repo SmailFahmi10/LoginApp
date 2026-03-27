@@ -19,39 +19,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Servicio responsable de la gestión de tokens JWT.
- *
- * Proporciona métodos para:
- * - Generar tokens JWT con claims personalizados y expiración configurable
- * - Validar tokens existentes (firma, expiración, formato)
- * - Extraer información (claims) de un token
- * - Determinar si un token es elegible para refresco
- */
 @Service
 public class JwtService {
 
     private static final Logger log = LoggerFactory.getLogger(JwtService.class);
 
-    /** Clave secreta codificada en Base64 (se lee desde application.properties) */
     @Value("${jwt.secret}")
     private String secret;
 
-    /** Tiempo de expiración del token en milisegundos */
     @Value("${jwt.expiration}")
     private long expiration;
 
-    /** Ventana de tiempo (ms) antes de expirar en la que se permite refrescar el token */
     @Value("${jwt.refresh-window}")
     private long refreshWindow;
 
-    /** Clave criptográfica derivada del secret para firmar/verificar tokens */
     private Key signingKey;
 
-    /**
-     * Inicializa la clave de firma tras la inyección de dependencias.
-     * Se usa HMAC-SHA256, que requiere una clave de al menos 256 bits.
-     */
     @PostConstruct
     public void init() {
         byte[] keyBytes = java.util.Base64.getDecoder().decode(secret);
@@ -60,14 +43,6 @@ public class JwtService {
                 expiration, refreshWindow);
     }
 
-    /**
-     * Genera un token JWT para un usuario autenticado.
-     *
-     * @param email email del usuario autenticado
-     * @param name  nombre completo del usuario
-     * @param role  rol del usuario en el sistema
-     * @return token JWT firmado como String
-     */
     public String generateToken(String email, String name, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
@@ -88,12 +63,6 @@ public class JwtService {
         return token;
     }
 
-    /**
-     * Valida un token JWT verificando firma, expiración y formato.
-     *
-     * @param token JWT a validar
-     * @return true si el token es válido, false en caso contrario
-     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -115,24 +84,11 @@ public class JwtService {
         return false;
     }
 
-    /**
-     * Extrae el email (subject) del token JWT.
-     *
-     * @param token JWT del que extraer el subject
-     * @return email del usuario contenido en el token
-     */
     public String getEmailFromToken(String token) {
         Claims claims = extractAllClaims(token);
         return claims.getSubject();
     }
 
-    /**
-     * Determina si un token es elegible para ser refrescado.
-     * Un token puede refrescarse si le quedan menos de 'refreshWindow' ms para expirar.
-     *
-     * @param token JWT a evaluar
-     * @return true si el token puede ser refrescado
-     */
     public boolean canRefreshToken(String token) {
         try {
             Claims claims = extractAllClaims(token);
@@ -151,13 +107,6 @@ public class JwtService {
         }
     }
 
-    /**
-     * Refresca un token generando uno nuevo con la misma información
-     * pero con una nueva fecha de expiración.
-     *
-     * @param token JWT actual a refrescar
-     * @return nuevo token JWT con expiración renovada
-     */
     public String refreshToken(String token) {
         Claims claims = extractAllClaims(token);
         String email = claims.getSubject();
@@ -168,17 +117,10 @@ public class JwtService {
         return generateToken(email, name, role);
     }
 
-    /** Devuelve el tiempo de expiración configurado en milisegundos. */
     public long getExpiration() {
         return expiration;
     }
 
-    /**
-     * Extrae todos los claims del payload del token JWT.
-     *
-     * @param token JWT del que extraer los claims
-     * @return objeto Claims con toda la información del token
-     */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey)

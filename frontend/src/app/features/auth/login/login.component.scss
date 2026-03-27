@@ -1,24 +1,13 @@
-// ============================================================
-// login.component.scss
-// BEM: .login-page (layout) + .login-form (organismo)
-// Atomic Design: átomos, moléculas y organismo definidos aquí
-// Usa variables y mixins del sistema de diseño (assets/scss)
-// ============================================================
-
-// Importar settings y tools del sistema de diseño
 @import "1-settings/variables";
 @import "3-tools/notouch-hover";
 @import "3-tools/flexbox";
 @import "3-tools/transition";
-
-// ---------- LAYOUT: .login-page ----------
 
 .login-page {
   @include flexbox(row, nowrap) {
     min-height: 100vh;
   }
 
-  // Columna izquierda: imagen decorativa (oculta en móvil)
   &__aside {
     @include flexbox(column, nowrap) {
       align-items: center;
@@ -39,7 +28,6 @@
     height: auto;
   }
 
-  // Columna derecha: contiene el formulario
   &__main {
     @include flexbox(column, nowrap) {
       align-items: center;
@@ -56,13 +44,10 @@
   }
 }
 
-// ---------- ORGANISMO: .login-form ----------
-
 .login-form {
   width: 100%;
   max-width: 420px;
 
-  // Cabecera: logo + título
   &__header {
     @include flexbox(column, nowrap) {
       align-items: flex-start;
@@ -80,20 +65,16 @@
     color: $neutral-10;
   }
 
-  // Cuerpo del formulario
   &__body {
     @include flexbox(column, nowrap) {
       width: 100%;
     }
   }
 
-  // ---------- MOLÉCULA: campo de formulario ----------
-
   &__field {
     width: 100%;
     margin-bottom: $spacing-s;
 
-    // Modificador: estado de error (añade borde rojo al wrapper)
     &--error {
       .mat-form-field-outline {
         color: $error;
@@ -104,8 +85,6 @@
       width: 100%;
     }
   }
-
-  // ---------- Error global (respuesta del backend) ----------
 
   &__error {
     @include flexbox(row, nowrap) {
@@ -132,16 +111,12 @@
     }
   }
 
-  // ---------- Acciones ----------
-
   &__actions {
     @include flexbox(column, nowrap) {
       gap: $spacing-m;
       margin-top: $spacing-s;
     }
   }
-
-  // ---------- ÁTOMO: botón genérico ----------
 
   &__btn {
     width: 100%;
@@ -150,7 +125,6 @@
     letter-spacing: 0.5px;
     @include transition(all 0.2s ease-in-out);
 
-    // Modificador: botón primario "ENTRAR"
     &--primary {
       background-color: $primary;
       color: $white;
@@ -165,7 +139,6 @@
       }
     }
 
-    // Modificador: botón SSO
     &--sso {
       @include flexbox(row, nowrap) {
         align-items: center;
@@ -183,18 +156,14 @@
     }
   }
 
-  // Icono SSO dentro del botón
   &__sso-icon {
     height: 20px;
     width: auto;
   }
 
-  // Spinner de carga dentro del botón
   &__spinner {
     display: inline-block;
   }
-
-  // ---------- Separador entre botones ----------
 
   &__divider {
     @include flexbox(row, nowrap) {
